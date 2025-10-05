@@ -16,11 +16,20 @@ HISTORY_FILE = "chat_history.json"
 
 def load_history():
     if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, list):  # ここで必ずリストか確認
+                return data
+            else:
+                return []
+        except:
+            return []
     return []
 
 def save_history(history):
+    if not isinstance(history, list):
+        history = []
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
 
@@ -62,6 +71,8 @@ if uploaded_files:
 
         # 履歴保存
         history = load_history()
+        if not isinstance(history, list):
+            history = []
         history.append({"question": query, "answer": answer})
         save_history(history)
 
